@@ -15,24 +15,31 @@ Sketch needs some libraries:
 
 Platform donoff uses pins from dsettings.h (there are teo preset templates) for varios  platform versions
 
+Blynk project:
+
+https://lab240.nethouse.ru/articles/donoff-blynk-simple#/qrengl
+(and manual in Russian)
+
 This sketch uses blynk virtual pins: 
 
 Buttons
 
-V2 - switch button
-v5 - on button
-V6 - off button
+- V2 - switch button
+- V5 - on button
+- V6 - off button
 
 Temperatures
 
-V8 - tempurature of external  ds1820
-V11 - tempurature of ds1820 on board
+- V8 - tempurature of external  ds1820
+- V11 - tempurature of ds1820 on board
 
 Informers
 
-V19 - uptime
-V12 - "on" time
-V6 - virtual LED
-V18 - tic tac LED
-V20 - current time 
-V21 - current date 
+- V19 - uptime
+- V12 - "on" time
+- V6 - virtual LED
+- V18 - tic tac LED
+- V20 - current time 
+- V21 - current date 
+
+my email: dj.novikov@gmail.com

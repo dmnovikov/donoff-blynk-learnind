@@ -1,32 +1,33 @@
 
 
-#define BUTTON_PIN   D3
-#define SONOFF_RELAY    D1
-#define SONOFF_LED      D4 //( old:15)
-#define IN_WIRE_BUS    D5
-#define OUT_WIRE_BUS D2
+#define BLYNK_PRINT Serial    // Comment this out to disable prints and save space
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+#include <TimeLib.h>
+#include <WidgetRTC.h>
+#include <Bounce2.h>
+//#include <EEPROM.h>
+#include <DallasTemperature.h>
+#include <OneWire.h>
+#include <Ticker.h>
+#include "dsettings.h"
 
-#define DALLAS_RES_IN 9
-#define DALLAS_RES_OUT 10
-
-#define AUTO_TEMP_ONOFF 1
-#define BUTTON_DELAY 50
-#define REVERSE_RELAY 0
 
 #define BLYNK_HEARTBEAT 300
 
-#define EEPROM_SALT 1220
-
-
-// You should get Auth Token in the Blynk App.
-// Go to the Project Settings (nut icon).
-char auth[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
-//char auth[] = "77777777777777777777777777777777777";
 
 // Your WiFi credentials.
 // Set password to "" for open networks.
-char ssid[] = "xxxxx";
-char pass[] = "xxxxxxxxxxxxxxxxxxxxxxxxxx";
+//char ssid[] = "xxxxx";
+//char pass[] = "xxxxxxxxxxxxxxxxxxxxxxxxxx";
+
+char ssid[] = "lab240";
+char pass[] = "6788766788";
+
+// Your Blynk auth
+//char auth[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
+char auth[] = "yaPvBoKcUNYks-ZBby8X5cF4iGOvYjDu";
 
 /*
 
@@ -45,25 +46,8 @@ char pass[] = "xxxxxxxxxxxxxxxxxxxxxxxxxx";
 
 
 
-#define BLYNK_PRINT Serial    // Comment this out to disable prints and save space
-#include <ESP8266WiFi.h>
-#include <BlynkSimpleEsp8266.h>
-#include <TimeLib.h>
-#include <WidgetRTC.h>
-#include <Bounce2.h>
-#include <WiFiManager.h>          //https://github.com/tzapu/WiFiManager
-#include <EEPROM.h>
-#include <DallasTemperature.h>
-#include <OneWire.h>
-#include <Ticker.h>
-//#include <SimpleTimer.h>
-#include "dsettings.h"
-
 static bool BLYNK_ENABLED = true;
 
-WMSettings settings;
-
-//SimpleTimer timer;
 
 WidgetRTC rtc;
 Bounce debouncer = Bounce();
@@ -142,7 +126,7 @@ int is_connected() {
 }
 
 bool r1_is_on() {
-  if (digitalRead(SONOFF_RELAY) == HIGH) {
+  if (digitalRead(RELAY1_PIN) == HIGH) {
     //Serial.println("check: relay is on");
     if (start_ms == 0) start_ms = millis();
     return 1;
@@ -191,9 +175,9 @@ void TturnOn() {
   stop_ms = 0;
   int s = LOW;
   if (REVERSE_RELAY) {
-    digitalWrite(SONOFF_RELAY, s);
+    digitalWrite(RELAY1_PIN, s);
   } else {
-    digitalWrite(SONOFF_RELAY, !s);
+    digitalWrite(RELAY1_PIN, !s);
   }
   sync_blink_mode();
 }
@@ -204,9 +188,9 @@ void TturnOff() {
   stop_ms = millis();
   int s = HIGH;
   if (REVERSE_RELAY) {
-    digitalWrite(SONOFF_RELAY, s);
+    digitalWrite(RELAY1_PIN, s);
   } else {
-    digitalWrite(SONOFF_RELAY, !s);
+    digitalWrite(RELAY1_PIN, !s);
   }
   sync_blink_mode();
 }
@@ -221,19 +205,6 @@ void toggle2() {
     //Serial.println("Try turn off");
   }
 
-}
-
-
-void restart() {
-  ESP.reset();
-  delay(1000);
-}
-
-void reset() {
-  WiFi.disconnect();
-  delay(1000);
-  ESP.reset();
-  delay(1000);
 }
 
 void sync_Blynk_led() {
@@ -381,17 +352,6 @@ void setup()
 {
   Serial.begin(9600);
 
-  EEPROM.begin(512);
-  EEPROM.get(0, settings);
-  EEPROM.end();
-
-  if (settings.salt != EEPROM_SALT) {
-    Serial.println("Invalid settings in EEPROM, trying with defaults");
-    WMSettings defaults;
-    settings = defaults;
-  }
-
-  
   start_ms = 0;
   stop_ms = millis();
 
@@ -434,7 +394,7 @@ void setup()
   }
 
   //setup relay
-  pinMode(SONOFF_RELAY, OUTPUT);
+  pinMode(RELAY1_PIN, OUTPUT);
 
   //TturnOff();
 
@@ -476,52 +436,12 @@ void sendUptime()
   Serial.print("online=" + String(connected));
   if (r1_is_on()) Serial.print(", status=ON"); else Serial.print(", status=OFF");
   Serial.println(" ***");
-/*
-  if (ms_ask_sensor_in == 0) {
-    sensorsIn.requestTemperatures();
-    ms_ask_sensor_in = millis();
-    Serial.println("Ask T1");
-  }
-
-  if (ms_ask_sensor_out == 0) {
-    sensorsOut.requestTemperatures();
-    ms_ask_sensor_out = millis();
-    Serial.println("Ask T2");
-  }
-*/
 
   if (temp1 != -127 && temp1 > 75) {
     TturnOff();
   }
-/*
-  if (millis() - ms_ask_sensor_in > request_circle) {
-    //ready, get temp
-    temp1 = sensorsIn.getTempCByIndex(0);
-    ms_ask_sensor_in = 0;
-    //publish
-    Serial.println("T1->" + String(temp1));
 
-  }
-
-  if (millis() - ms_ask_sensor_out > request_circle) {
-    //ready, get temp
-    temp2 = sensorsOut.getTempCByIndex(0);
-    ms_ask_sensor_out = 0;
-    //publish
-    Serial.println("T2->" + String(temp2));
-
-  }
-*/
   sync_blink_mode();
-
-  /*
-    if (start_bt != 0) {
-     //Serial.print(cmd);
-     Serial.println("Button pressed, DO Nothing");
-     return;
-    }
-  */
-
 
   Serial.println("uptime:" + get_time_string_str(millis()));
   if (start_ms != 0) {
@@ -544,18 +464,6 @@ void sendUptime()
   Blynk.virtualWrite(V8, String(temp2));
 
   sync_Blynk_led();
-
-  /*
-    if (start_ms == 0) {
-      Blynk.virtualWrite(V12, "OFF");
-      Blynk.virtualWrite(V13, get_time_string_str(millis()-stop_ms));
-      Blynk.virtualWrite(V6, 0);
-    } else {
-      Blynk.virtualWrite(V12,  get_time_string_str(millis()-start_ms));
-      Blynk.virtualWrite(V13,  "OFF");
-      Blynk.virtualWrite(V6, 220);
-    }
-  */
 
   //publish chronometer
   if (hronometer == 1)Blynk.virtualWrite(V18, "0");
@@ -630,8 +538,6 @@ int get_ds1820(){
   }
 }
 
-//int bl = 1;
-int reconfigured = 0;
 unsigned long mytimer = millis();
 int  mycounter = 0;
 
@@ -673,12 +579,8 @@ void loop()
     mytimer = millis();
   }
 
-
-
-
   debouncer.update();
   if ( debouncer.fell()  ) {
-    ;
     Serial.println( "down");
     start_bt = millis();
 
@@ -701,12 +603,8 @@ void loop()
     } else if (duration >= 3000) {
       //something when long press
     }
-    //ESP.restart();
-
 
 
   }
-
-
 
 }

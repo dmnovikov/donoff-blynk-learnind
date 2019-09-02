@@ -22,12 +22,13 @@
 //char pass[] = "xxxxxxxxxxxxxxxxxxxxxxxxxx";
 
 char ssid[] = "lab240";
-char pass[] = "6788766788";
+char pass[] = "xxxxxxxx";
 
 // Your Blynk auth
-//char auth[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+char auth[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
-char auth[] = "yaPvBoKcUNYks-ZBby8X5cF4iGOvYjDu";
+
+
 
 /*
  * 

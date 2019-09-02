@@ -30,18 +30,29 @@ char pass[] = "6788766788";
 char auth[] = "yaPvBoKcUNYks-ZBby8X5cF4iGOvYjDu";
 
 /*
+ * 
+ *  Blynk virtual pins
 
-   V12 время включенного состояния
-   V11 врнутренняя температура
-   V8  внешний датчик
-   V6  виртуальный индикатор
-   V18 - хронометр
-   V19 - аптайм
-   V20 - текущее время
-   V21 - текущая дата
-   V2  - кнопка переключения
-   V5 - кнопка включить
-   V6 - кнопка выключить
+Buttons
+
+V2 - switch button
+V5 - on button
+V6 - off button
+
+Temperatures
+
+V8 - tempurature of external ds1820
+V11 - tempurature of ds1820 on board
+
+Informers
+
+V19 - uptime
+V12 - "on" time
+V6 - virtual LED
+V18 - tic tac LED
+V20 - current time
+V21 - current date
+
 */
 
 
